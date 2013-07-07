@@ -1,16 +1,12 @@
 package Mail::ToAPI::Checkvist;
 
 use strict;
-use 5.008_005;
-our $VERSION = '0.01';
+use 5.010;
+our $VERSION = '0.1';
 
 use WebService::Simple;
 use Email::MIME;
 use Email::Address;
-
-use parent 'Exporter';
-
-our @EXPORT = qw/parse_email_from_stdin add_task_to_checkvist/;
 
 our $Chv;
 
@@ -29,35 +25,87 @@ sub _init_api {
     return $Chv;
 }
 
-sub parse_email_from_stdin {
-	my ($from, $to, $subject);
+sub _parse_to {
+    my $to = shift;
+    my ($login, $remotekey, $list_id, $list_tag);
 
-	binmode STDIN, ':bytes';
-	my $email = Email::MIME->new(join "", <STDIN>);
+    $to   = (Email::Address->parse($to))[0]->user;
 
-	$subject = $email->header('Subject');
-	$to   = (Email::Address->parse($email->header_obj->header_raw('To')))[0]->user;
-	$from = (Email::Address->parse($email->header_obj->header_raw('From')))[0]->address;
+    # = given, but I need "redo"
+    for ($to) {
+        s/^ post \+//xms;
 
-	my ($remotekey, $list_id);
-	if	($to =~ /^([^+]+)\+(\d+)$/) {
-		($remotekey, $list_id) = ($1, $2);
-	}
-	elsif	($to =~ /^([^+]+)\+([^+]+)\+(\d+)$/) {
-		($from, $remotekey, $list_id) = ($1, $2, $3);
-		$from =~ tr/$=/@@/;
-	}
+        # we do not allow "." in remotekey to distinguish between
+        # user$domain.com+remotekey@ and
+        # remotekey+list_tag
+        # fortunately, Checkvist remotekeys do not contain "."
+        when (/^ ([^+.]+) \+ (\d+) $/xms) {
+            ($remotekey, $list_id) = ($1, $2);
+        }
+        when (/^ ([^+.]+) \+ ([^+]+) $/xms) {
+            ($remotekey, $list_tag) = ($1, $2);
+        }
+        when (/^ ([^+.]+) $/xms) {
+            $remotekey = $1;
+        }
 
-	return ($from, $remotekey, $list_id, $subject);
+        if (s/^ ([^+]+) \+ //xms) {
+            $login = $1;
+            $login =~ tr/$=/@@/;
+
+            redo;
+        }
+    }
+
+    return ($login, $remotekey, $list_id, $list_tag);
 }
 
-sub add_task_to_checkvist {
-	my ($login, $remotekey, $list_id, $task_text) = @_;
-	my $chv = _init_api($login, $remotekey);
+sub parse_email {
+        my $fh = pop;
+
+	my ($from, $to, $subject);
+
+	binmode $fh, ':bytes';
+	my $email = Email::MIME->new(join "", <$fh>);
+
+	$subject = $email->header('Subject');
+	$from = (Email::Address->parse($email->header_obj->header_raw('From')))[0]->address;
+
+	my ($login, $remotekey, $list_id, $list_tag) = _parse_to($email->header_obj->header_raw('To'));
+
+	return {
+	    type        => 'add_task',
+
+	    login       => $login // $from,
+	    remotekey   => $remotekey,
+
+	    list_id     => $list_id,
+	    list_tag    => $list_tag,
+	    text        => $subject
+        };
+}
+
+sub execute {
+    my $job = pop;
+
+    my $rv;
+    given ($job->{type}) {
+        when ('add_task') {
+            $rv = _add_task($job);
+        }
+    }
+
+    return $rv;
+}
+
+sub _add_task {
+        my $job = shift;
+
+	my $chv = _init_api($job->{login}, $job->{remotekey});
 
 	my $rv =
-	    $chv->post("checklists/$list_id/import.json", {
-		    import_content  => $task_text,
+	    $chv->post("checklists/$job->{list_id}/import.json", {
+		    import_content  => $job->{text},
 		    parse_tasks     => 1,
 	    });
 

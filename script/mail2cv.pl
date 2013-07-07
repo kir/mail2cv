@@ -22,10 +22,10 @@ open STDERR, '>>', '/home/kappa/2cv.log';
 
 eval {
 	say STDERR scalar localtime;
-	my ($login, $remotekey, $list_id, $task_text)
-		= parse_email_from_stdin();
-	say STDERR "for $login";
-	add_task_to_checkvist($login, $remotekey, $list_id, $task_text);
+	my $job = Mail::ToAPI::Checkvist->parse_email(*STDIN);
+
+	say STDERR "for $job->{login}";
+        Mail::ToAPI::Checkvist->execute($job);
 };
 
 if ($@) {

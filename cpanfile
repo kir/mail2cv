@@ -10,6 +10,7 @@ requires 'parent';
 
 on test => sub {
     requires 'Test::More', '0.88';
+    requires 'Test::Deep';
 };
 
 on develop => sub {
