@@ -60,9 +60,23 @@ Mail::ToAPI::Checkvist - Email in tasks for Checkvist.com, see Mail2CV.com
 
   use Mail::ToAPI::Checkvist;
 
+or
+
+  % mail2cv.pl < email.eml
+
 =head1 DESCRIPTION
 
-Mail::ToAPI::Checkvist is
+This is the script that powers Mail2CV.com.
+
+It is a service that allows adding tasks to your Checkvist.com list via email.
+
+You will need a fairly modern perl and some modules from CPAN:
+
+uni::perl, WebService::Simple, Email::MIME, Email::Address
+
+You will also need to set up some email forwarding to feed incoming
+emails to the script.  I use a catch-all virtual domain in Postfix and
+a simple ~/.forward with a pipe.
 
 =head1 AUTHOR
 
@@ -80,6 +94,6 @@ it under the terms of the GNU Affero General Public License, Version
 
 =head1 SEE ALSO
 
-http://checkvist.com
+L<http://checkvist.com>
 
 =cut

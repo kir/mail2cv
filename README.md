@@ -5,6 +5,7 @@ Mail::ToAPI::Checkvist - Email in tasks for Checkvist.com, see Mail2CV.com
 # SYNOPSIS
 
     use Mail::ToAPI::Checkvist;
+
 or
 
     % mail2cv.pl < email.eml
@@ -23,7 +24,6 @@ You will also need to set up some email forwarding to feed incoming
 emails to the script.  I use a catch-all virtual domain in Postfix and
 a simple ~/.forward with a pipe.
 
-
 # AUTHOR
 
 Alex Kapranoff <alex@kapranoff.ru>
@@ -40,4 +40,4 @@ it under the terms of the GNU Affero General Public License, Version
 
 # SEE ALSO
 
-http://checkvist.com
+[http://checkvist.com](http://checkvist.com)

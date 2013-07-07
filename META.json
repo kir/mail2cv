@@ -50,6 +50,20 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kappa/mail2cv/issues"
+      },
+      "homepage" : "https://github.com/kappa/mail2cv",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kappa/mail2cv.git",
+         "web" : "https://github.com/kappa/mail2cv"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Alex Kapranoff <kappa@kibris.kapranoff.ru>"
+   ]
 }
 
