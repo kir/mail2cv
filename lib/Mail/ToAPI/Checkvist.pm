@@ -12,6 +12,23 @@ use parent 'Exporter';
 
 our @EXPORT = qw/parse_email_from_stdin add_task_to_checkvist/;
 
+our $Chv;
+
+sub _init_api {
+    my ($login, $remotekey) = @_;
+
+    unless ($Chv) {
+        $Chv = WebService::Simple->new(
+            base_url    => 'http://checkvist.com/',
+            response_parser => 'JSON',
+        );
+
+        $Chv->credentials('checkvist.com:80', 'Application', $login, $remotekey);
+    }
+
+    return $Chv;
+}
+
 sub parse_email_from_stdin {
 	my ($from, $to, $subject);
 
@@ -36,11 +53,7 @@ sub parse_email_from_stdin {
 
 sub add_task_to_checkvist {
 	my ($login, $remotekey, $list_id, $task_text) = @_;
-	my $chv = WebService::Simple->new(
-	    base_url    => 'http://checkvist.com/',
-	    response_parser => 'JSON',
-	);
-	$chv->credentials('checkvist.com:80', 'Application', $login, $remotekey);
+	my $chv = _init_api($login, $remotekey);
 
 	my $rv =
 	    $chv->post("checklists/$list_id/import.json", {
@@ -53,11 +66,7 @@ sub add_task_to_checkvist {
 
 sub fetch_tasks {
 	my ($login, $remotekey, $list_id) = @_;
-	my $chv = WebService::Simple->new(
-	    base_url    => 'http://checkvist.com/',
-	    response_parser => 'JSON',
-	);
-	$chv->credentials('checkvist.com:80', 'Application', $login, $remotekey);
+	my $chv = _init_api($login, $remotekey);
 
 	my $rv = $chv->get("checklists/$list_id/tasks.json");
 
