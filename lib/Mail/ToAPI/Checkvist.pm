@@ -1,26 +1,16 @@
-#!/usr/bin/perl
+package Mail::ToAPI::Checkvist;
 
-# Copyright 2013 Alex Kapranoff
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
-# 
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+use strict;
+use 5.008_005;
+our $VERSION = '0.01';
 
-use uni::perl;
 use WebService::Simple;
 use Email::MIME;
 use Email::Address;
 
-open STDERR, '>>', '/home/kappa/2cv.log';
+use Exporter;
+
+our @EXPORT = qw/parse_email_from_stdin add_task_to_checkvist/;
 
 sub parse_email_from_stdin {
 	my ($from, $to, $subject);
@@ -57,16 +47,39 @@ sub add_task_to_checkvist {
 	});
 }
 
-eval {
-	say STDERR scalar localtime;
-	my ($login, $remotekey, $list_id, $task_text)
-		= parse_email_from_stdin();
-	say STDERR "for $login";
-	add_task_to_checkvist($login, $remotekey, $list_id, $task_text);
-};
+1;
+__END__
 
-if ($@) {
-	say STDERR 'Exception: ', $@;
-}
+=encoding utf-8
 
-exit 0;
+=head1 NAME
+
+Mail::ToAPI::Checkvist - Email in tasks for Checkvist.com, see Mail2CV.com
+
+=head1 SYNOPSIS
+
+  use Mail::ToAPI::Checkvist;
+
+=head1 DESCRIPTION
+
+Mail::ToAPI::Checkvist is
+
+=head1 AUTHOR
+
+Alex Kapranoff E<lt>alex@kapranoff.ruE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2013 Alex Kapranoff
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License, Version
+3.
+
+=head1 SEE ALSO
+
+http://checkvist.com
+
+=cut
