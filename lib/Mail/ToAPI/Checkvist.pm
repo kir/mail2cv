@@ -50,6 +50,19 @@ sub add_task_to_checkvist {
 	return $rv && $rv->parse_response;
 }
 
+sub fetch_tasks {
+	my ($login, $remotekey, $list_id) = @_;
+	my $chv = WebService::Simple->new(
+	    base_url    => 'http://checkvist.com/',
+	    response_parser => 'JSON',
+	);
+	$chv->credentials('checkvist.com:80', 'Application', $login, $remotekey);
+
+	my $rv = $chv->get("checklists/$list_id/tasks.json");
+
+	return $rv && $rv->parse_response;
+}
+
 1;
 __END__
 
