@@ -61,28 +61,28 @@ sub _parse_to {
 }
 
 sub parse_email {
-        my $fh = pop;
+    my $fh = pop;
 
-	my ($from, $to, $subject);
+    my ($from, $to, $subject);
 
-	binmode $fh, ':bytes';
-	my $email = Email::MIME->new(join "", <$fh>);
+    binmode $fh, ':bytes';
+    my $email = Email::MIME->new(join "", <$fh>);
 
-	$subject = $email->header('Subject');
-	$from = (Email::Address->parse($email->header_obj->header_raw('From')))[0]->address;
+    $subject = $email->header('Subject');
+    $from = (Email::Address->parse($email->header_obj->header_raw('From')))[0]->address;
 
-	my ($login, $remotekey, $list_id, $list_tag) = _parse_to($email->header_obj->header_raw('To'));
+    my ($login, $remotekey, $list_id, $list_tag) = _parse_to($email->header_obj->header_raw('To'));
 
-	return {
-	    type        => 'add_task',
+    return {
+        type        => 'add_task',
 
-	    login       => $login // $from,
-	    remotekey   => $remotekey,
+        login       => $login // $from,
+        remotekey   => $remotekey,
 
-	    list_id     => $list_id,
-	    list_tag    => $list_tag,
-	    text        => $subject
-        };
+        list_id     => $list_id,
+        list_tag    => $list_tag,
+        text        => $subject
+    };
 }
 
 sub execute {
@@ -99,26 +99,26 @@ sub execute {
 }
 
 sub _add_task {
-        my $job = shift;
+    my $job = shift;
 
-	my $chv = _init_api($job->{login}, $job->{remotekey});
+    my $chv = _init_api($job->{login}, $job->{remotekey});
 
-	my $rv =
-	    $chv->post("checklists/$job->{list_id}/import.json", {
-		    import_content  => $job->{text},
-		    parse_tasks     => 1,
-	    });
+    my $rv =
+        $chv->post("checklists/$job->{list_id}/import.json", {
+            import_content  => $job->{text},
+            parse_tasks     => 1,
+        });
 
-	return $rv && $rv->parse_response->[0];
+    return $rv && $rv->parse_response->[0];
 }
 
 sub fetch_tasks {
-	my ($login, $remotekey, $list_id) = @_;
-	my $chv = _init_api($login, $remotekey);
+    my ($login, $remotekey, $list_id) = @_;
+    my $chv = _init_api($login, $remotekey);
 
-	my $rv = $chv->get("checklists/$list_id/tasks.json");
+    my $rv = $chv->get("checklists/$list_id/tasks.json");
 
-	return $rv && $rv->parse_response;
+    return $rv && $rv->parse_response;
 }
 
 1;

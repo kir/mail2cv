@@ -21,15 +21,15 @@ use Mail::ToAPI::Checkvist;
 open STDERR, '>>', '/home/kappa/2cv.log';
 
 eval {
-	say STDERR scalar localtime;
-	my $job = Mail::ToAPI::Checkvist->parse_email(*STDIN);
+    say STDERR scalar localtime;
+    my $job = Mail::ToAPI::Checkvist->parse_email(*STDIN);
 
-	say STDERR "for $job->{login}";
-        Mail::ToAPI::Checkvist->execute($job);
+    say STDERR "for $job->{login}";
+    Mail::ToAPI::Checkvist->execute($job);
 };
 
 if ($@) {
-	say STDERR 'Exception: ', $@;
+    say STDERR 'Exception: ', $@;
 }
 
 exit 0;
