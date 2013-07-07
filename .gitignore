@@ -1,0 +1,6 @@
+/Mail-ToAPI-Checkvist-*
+/.build
+/_build*
+/Build
+MYMETA.*
+!META.json
