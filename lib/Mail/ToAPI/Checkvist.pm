@@ -43,11 +43,12 @@ sub add_task_to_checkvist {
 	$chv->credentials('checkvist.com:80', 'Application', $login, $remotekey);
 
 	my $rv =
-	    $chv->post("checklists/$list_id/tasks.json", {
-		    'task[content]' => $task_text,
+	    $chv->post("checklists/$list_id/import.json", {
+		    import_content  => $task_text,
+		    parse_tasks     => 1,
 	    });
 
-	return $rv && $rv->parse_response;
+	return $rv && $rv->parse_response->[0];
 }
 
 sub fetch_tasks {
