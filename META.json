@@ -49,6 +49,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Deep" : "0",
             "Test::More" : "0.88"
          }
       }
@@ -65,7 +66,7 @@
          "web" : "https://github.com/kappa/mail2cv"
       }
    },
-   "version" : "0.01",
+   "version" : "0.1",
    "x_contributors" : [
       "Alex Kapranoff <kappa@kibris.kapranoff.ru>"
    ]
