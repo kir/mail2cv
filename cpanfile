@@ -6,7 +6,9 @@ requires 'WebService::Simple';
 requires 'uni::perl';
 requires 'Email::MIME';
 requires 'Email::Address';
+requires 'parent';
 
 on test => sub {
     requires 'Test::More', '0.88';
+    requires 'Test::Deep';
 };

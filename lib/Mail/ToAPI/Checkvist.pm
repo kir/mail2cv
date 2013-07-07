@@ -8,7 +8,7 @@ use WebService::Simple;
 use Email::MIME;
 use Email::Address;
 
-use Exporter;
+use parent 'Exporter';
 
 our @EXPORT = qw/parse_email_from_stdin add_task_to_checkvist/;
 
@@ -42,9 +42,12 @@ sub add_task_to_checkvist {
 	);
 	$chv->credentials('checkvist.com:80', 'Application', $login, $remotekey);
 
-	$chv->post("checklists/$list_id/tasks.json", {
-		'task[content]' => $task_text,
-	});
+	my $rv =
+	    $chv->post("checklists/$list_id/tasks.json", {
+		    'task[content]' => $task_text,
+	    });
+
+	return $rv && $rv->parse_response;
 }
 
 1;
