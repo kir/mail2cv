@@ -7,8 +7,10 @@ our $VERSION = '0.1';
 use WebService::Simple;
 use Email::MIME;
 use Email::Address;
+use List::Util qw/first/;
 
 our $Chv;
+our $Last_Error;
 
 sub _init_api {
     my ($login, $remotekey) = @_;
@@ -73,6 +75,7 @@ sub parse_email {
 
     my ($login, $remotekey, $list_id, $list_tag) = _parse_to($email->header_obj->header_raw('To'));
 
+    $Last_Error = '';
     return {
         type        => 'add_task',
 
@@ -89,10 +92,21 @@ sub execute {
     my $job = pop;
 
     my $rv;
-    given ($job->{type}) {
-        when ('add_task') {
-            $rv = _add_task($job);
+
+    eval {
+        given ($job->{type}) {
+            when ('add_task') {
+                $rv = _add_task($job);
+            }
         }
+    };
+
+    if ($@) {
+        $Last_Error = $@;
+        undef $rv;
+    }
+    else {
+        $Last_Error = '';
     }
 
     return $rv;
@@ -102,6 +116,18 @@ sub _add_task {
     my $job = shift;
 
     my $chv = _init_api($job->{login}, $job->{remotekey});
+
+    unless ($job->{list_id}) {
+        my $list_tag = $job->{list_tag} // 'inbox';   # default
+        my $lists = $chv->get("checklists.json")->parse_response;
+
+        if (my $list = first { $_->{tags}->{$list_tag} eq 'false' } @$lists) {
+            $job->{list_id} = $list->{id};
+        }
+        else {
+            die "list tag not found\n";
+        }
+    }
 
     my $rv =
         $chv->post("checklists/$job->{list_id}/import.json", {
@@ -119,6 +145,10 @@ sub fetch_tasks {
     my $rv = $chv->get("checklists/$list_id/tasks.json");
 
     return $rv && $rv->parse_response;
+}
+
+sub last_error {
+    return $Last_Error;
 }
 
 1;
