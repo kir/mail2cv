@@ -8,20 +8,23 @@ use WebService::Simple;
 use Email::MIME;
 use Email::Address;
 use List::Util qw/first/;
+use URI;
 
+our $API_Endpoint = 'http://checkvist.com';
 our $Chv;
 our $Last_Error;
 
 sub _init_api {
     my ($login, $remotekey) = @_;
+    my $uri = URI->new($API_Endpoint);
 
     unless ($Chv) {
         $Chv = WebService::Simple->new(
-            base_url    => 'http://checkvist.com/',
+            base_url        => $API_Endpoint,
             response_parser => 'JSON',
         );
 
-        $Chv->credentials('checkvist.com:80', 'Application', $login, $remotekey);
+        $Chv->credentials($uri->host_port, 'Application', $login, $remotekey);
     }
 
     return $Chv;

@@ -18,6 +18,8 @@
 use uni::perl;
 use Mail::ToAPI::Checkvist;
 
+$Mail::ToAPI::Checkvist::API_Endpoint = 'https://beta.checkvist.com';
+
 open STDERR, '>>', '/home/kappa/2cv.log';
 
 eval {
