@@ -1,0 +1,5 @@
+[checkvist]
+api_endpoint = https://beta.checkvist.com
+
+[mail2cv]
+logfile = /home/kappa/2cv.log

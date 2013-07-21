@@ -17,10 +17,15 @@
 
 use uni::perl;
 use Mail::ToAPI::Checkvist;
+use Config::Tiny;
 
-$Mail::ToAPI::Checkvist::API_Endpoint = 'https://beta.checkvist.com';
+my $Cfg = Config::Tiny->read("$ENV{HOME}/.mail2cvrc")
+    || Config::Tiny->read('/etc/mail2cv/mail2cv.rc')
+    || {};
 
-open STDERR, '>>', '/home/kappa/2cv.log';
+$Mail::ToAPI::Checkvist::API_Endpoint = $Cfg->{checkvist}->{api_endpoint} // 'https://beta.checkvist.com';
+
+open STDERR, '>>', $Cfg->{mail2cv}->{logfile} // "$ENV{HOME}/2cv.log";
 
 eval {
     say STDERR scalar localtime;

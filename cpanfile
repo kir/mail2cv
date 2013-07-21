@@ -8,6 +8,7 @@ requires 'Email::MIME';
 requires 'Email::Address';
 requires 'parent';
 requires 'List::Util';
+requires 'Config::Tiny';
 
 on test => sub {
     requires 'Test::More', '0.88';
