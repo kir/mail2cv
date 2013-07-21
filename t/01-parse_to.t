@@ -8,7 +8,7 @@ use Test::Deep;
 use Mail::ToAPI::Checkvist;
 *parse_to = \&Mail::ToAPI::Checkvist::_parse_to;
 
-# ($login, $remoteley, $list_id, $list_tag);
+# ($login, $remotekey, $list_id, $list_tag);
 my @rv;
 
 cmp_deeply([parse_to('key1+123@mail2cv.com')], [undef, 'key1', 123, undef], 'basic key');
@@ -25,5 +25,7 @@ cmp_deeply([parse_to('me=gmail.com+key3+inbox@mail2cv.com')], ['me@gmail.com', '
 
 cmp_deeply([parse_to('kappa@mail2cv.com')], [undef, 'kappa', undef, undef], 'degenerate case of simple email address');
 cmp_deeply([parse_to('post+key2@checkvist.com')], [undef, 'key2', undef, undef], 'what Kirill wants');
+
+# ($login, $remotekey, $list_id, $list_tag);
 
 done_testing;
