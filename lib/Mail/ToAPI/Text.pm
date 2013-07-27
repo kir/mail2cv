@@ -18,18 +18,15 @@ sub _ct {
     return "$data->{discrete}/$data->{composite}";
 }
 
-our %CT_WEIGHT = {
-    'text/html'                 => 10,
-    'multipart/related'         => 9,
-    'multipart/mixed'           => 9,
-    'multipart/alternative'     => 8,
-    'text/plain'                => 7,
-};
+sub _may_contain_text {
+    my $part = shift;
 
-sub _ct_pref {
-    my $header = shift;
+    my $ct = parse_content_type($part->content_type);
 
-    return $CT_WEIGHT{_ct($header)} || 1;
+    return  $ct->{discrete} eq 'multipart'
+        || ($ct->{discrete} eq 'text'
+            && ($ct->{composite} eq 'plain' || $ct->{composite} eq 'html')
+            && ($part->header('Content-Disposition') || '') !~ /^attachment\b/)
 }
 
 sub _render_recur {
@@ -41,8 +38,16 @@ sub _render_recur {
             $result = _render_recur(($part->subparts)[0]);
         }
         when ('multipart/alternative') {
-            my $best_part = reduce { _ct_pref($a) > _ct_pref($b) ? $a : $b } $part->subparts;
+            # choose the last of all supported, may also be
+            # implemented as (grep)[-1]
+            # if there's 1 subpart, always return it
+            my $best_part = reduce { _may_contain_text($b) ? $b : $a } $part->subparts;
             $result = _render_recur($best_part);
+        }
+        when (m{^multipart/}) { # 'mixed' and all others
+            $result = join "\n",
+                map { _render_recur($_) }
+                grep { _may_contain_text($_) } $part->subparts;
         }
         when ('text/html') {
             $result = textify_html($part->body_str);

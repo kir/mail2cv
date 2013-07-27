@@ -47,3 +47,7 @@ is_email_parsed_ok('03-mpalt.eml', {
 is_email_parsed_ok('04-mprel.eml', {
         note        => "Картинка:\n\n После картинки.",
     });
+
+is_email_parsed_ok('05-mpmixed.eml', {
+        note        => "A small attachment follows.",
+    });
