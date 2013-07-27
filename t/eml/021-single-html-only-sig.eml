@@ -1,0 +1,12 @@
+From: Alex Kapranoff <kappa@example.com>
+To: =?koi8-r?B?4czFy9PFyiDrwdDSwc7P1w==?= <kappa@example.com>
+Subject: signature only html body
+MIME-Version: 1.0
+Message-Id: <193691374937590@web2f.yandex.ru>
+X-Mailer: Yamail [ http://yandex.ru ] 5.0
+Date: Sat, 27 Jul 2013 19:06:30 +0400
+Content-Transfer-Encoding: 8bit
+Content-Type: text/html; charset=utf-8
+
+<div> </div><div> </div><div>-- <br />Алексей Капранов,<br />такие дела.</div>
+

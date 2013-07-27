@@ -11,16 +11,18 @@ use Test::NoWarnings;
 use Mail::ToAPI::Checkvist;
 use FindBin;
 
-sub is_email_parsed_ok {
-    my ($base_eml, $data) = @_;
-
+sub job_from_eml {
+    my $base_eml = shift;
     open my $fh, '<', "$FindBin::Bin/eml/$base_eml"
         or die "Cannot open $base_eml under $FindBin::Bin: $!";
 
-    my $job = Mail::ToAPI::Checkvist::parse_email($fh);
+    return Mail::ToAPI::Checkvist::parse_email($fh);
+}
 
-#    use Data::Dumper;
-#    print Dumper($job);
+sub is_email_parsed_ok {
+    my ($base_eml, $data) = @_;
+
+    my $job = job_from_eml($base_eml);
 
     cmp_deeply($job, superhashof({ %$data, type => 'add_task' }),
         "test in $base_eml");
@@ -38,6 +40,15 @@ is_email_parsed_ok('01-simple.eml', {
 
 is_email_parsed_ok('02-single-html.eml', {
         note        => "note2 in html\nw some Unicode: 🂄 and ♣\nline1\nline2",
+    });
+
+cmp_deeply(job_from_eml('021-single-html-only-sig.eml'), {
+        type    => 'add_task',
+        login   => 'kappa@example.com',
+        text    => 'signature only html body',
+        list_id => ignore(),
+        list_tag=> ignore(),
+        remotekey=> ignore(),
     });
 
 is_email_parsed_ok('03-mpalt.eml', {

@@ -93,7 +93,9 @@ sub parse_email {
         list_tag    => $list_tag,
         text        => $subject,
 
-        note        => $body_text,
+        ($body_text
+            ? (note        => $body_text)
+            : ()),
     };
 }
 
