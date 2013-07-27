@@ -65,6 +65,17 @@ sub _parse_to {
     return ($login, $remotekey, $list_id, $list_tag);
 }
 
+sub _parse_for_text {
+    my $email = shift;
+
+    my $body_str = $email->body_str;
+
+    $body_str =~ s/^\s+//s;
+    $body_str =~ s/\s+\z//s;
+
+    return $body_str;
+}
+
 sub parse_email {
     my $fh = pop;
 
@@ -78,6 +89,8 @@ sub parse_email {
 
     my ($login, $remotekey, $list_id, $list_tag) = _parse_to($email->header_obj->header_raw('To'));
 
+    my $body_text = _parse_for_text($email);
+
     $Last_Error = '';
     return {
         type        => 'add_task',
@@ -87,7 +100,9 @@ sub parse_email {
 
         list_id     => $list_id,
         list_tag    => $list_tag,
-        text        => $subject
+        text        => $subject,
+
+        note        => $body_text,
     };
 }
 

@@ -29,3 +29,7 @@ is_email_parsed_ok('01-simple.eml', {
         login       => 'vasya@yandex.com',
         remotekey   => 'key1',
     });
+
+is_email_parsed_ok('01-simple.eml', {
+        note        => 'note1',
+    });
