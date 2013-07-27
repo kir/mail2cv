@@ -55,4 +55,6 @@ is_email_parsed_ok('04-mprel.eml', {
 is_email_parsed_ok('05-mpmixed.eml', {
         note        => "A small attachment follows.",
     });
-# XXX not tested: when there attachments excluded by ct not disp
+is_email_parsed_ok('051-mpmixed-ex.eml', {
+        note        => "A small attachment follows.\n\nSecond text file.",
+    });
