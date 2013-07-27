@@ -44,6 +44,10 @@ is_email_parsed_ok('03-mpalt.eml', {
         note        => "Это первая строка.\nЭто вторая.\n\nЭто третья после пустой.",
     });
 
+is_email_parsed_ok('031-mpalt-ex.eml', {
+        note        => "Это первая строка.\nЭто вторая.\n\nЭто третья после пустой.",
+    });
+
 is_email_parsed_ok('04-mprel.eml', {
         note        => "Картинка:\n\n После картинки.",
     });
@@ -51,3 +55,4 @@ is_email_parsed_ok('04-mprel.eml', {
 is_email_parsed_ok('05-mpmixed.eml', {
         note        => "A small attachment follows.",
     });
+# XXX not tested: when there attachments excluded by ct not disp
