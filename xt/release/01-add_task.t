@@ -22,12 +22,23 @@ my $add_task_job = {
     list_id     => $test_list_id,
 
     text        => "$test_task #testtag",
+
+    note        => 'note1',
 };
 my $rv;
 ok($rv = Mail::ToAPI::Checkvist->execute($add_task_job), 'task added');
 
 is($rv->{content}, $test_task, 'content matches');
 like($rv->{id}, qr/^\d+$/, 'numeric id assigned');
+
+is($rv->{checklist_id}, $test_list_id, 'correct list chosen');
+
+my $tasks = Mail::ToAPI::Checkvist::fetch_tasks($test_login, $test_key, $test_list_id);
+my $full_task = (grep { $_->{id} == $rv->{id} } @$tasks)[0];
+ok($full_task->{notes}, "there are notes");
+is($full_task->{notes}->[0]->{note}->{comment}, 'note1', "correct note was added");
+
+delete $add_task_job->{note};
 
 is($rv->{tags}->{testtag}, 'false', 'tag parsing works');
 
@@ -63,14 +74,16 @@ sub ok_task_from_eml {
     run_ok('mail2cv.pl', [], 'mail2cv.pl run');
 
     my $tasks = Mail::ToAPI::Checkvist::fetch_tasks($test_login, $test_key, $test_list_id);
+    my $full_task = (grep { $_->{content} =~ /from email $uuid/ } @$tasks)[0];
 
-    ok(scalar(grep { $_->{content} =~ /from email $uuid/ } @$tasks), "task $uuid added");
+    ok($full_task, "task $uuid added");
+    is($full_task->{notes}->[0]->{note}->{comment}, 'body', "note from email was added");
 }
 
 ok_task_from_eml(<<"EOM");
 From: "Mail2CV Tester" <$test_login>
 To: <$test_key+$test_list_id\@mail2cv.com>
-Subject: $test_task
+Subject: $test_task from eml via script
 
 body
 EOM

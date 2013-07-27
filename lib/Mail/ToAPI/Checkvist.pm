@@ -144,6 +144,9 @@ sub _add_task {
         $chv->post("checklists/$job->{list_id}/import.json", {
             import_content  => $job->{text},
             parse_tasks     => 1,
+            ($job->{note}
+                ? (import_content_note => $job->{note})
+                : ()),
         });
 
     return $rv && $rv->parse_response->[0];
@@ -153,7 +156,8 @@ sub fetch_tasks {
     my ($login, $remotekey, $list_id) = @_;
     my $chv = _init_api($login, $remotekey);
 
-    my $rv = $chv->get("checklists/$list_id/tasks.json");
+    my $rv = $chv->get("checklists/$list_id/tasks.json",
+        { with_notes    => 1 });
 
     return $rv && $rv->parse_response;
 }
