@@ -39,3 +39,7 @@ is_email_parsed_ok('01-simple.eml', {
 is_email_parsed_ok('02-single-html.eml', {
         note        => "note2 in html\nw some Unicode: 🂄 and ♣\nline1\nline2",
     });
+
+is_email_parsed_ok('03-mpalt.eml', {
+        note        => "Это первая строка.\nЭто вторая.\n\nЭто третья после пустой.",
+    });

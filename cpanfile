@@ -11,6 +11,7 @@ requires 'List::Util';
 requires 'Config::Tiny';
 requires 'HTML::Parser';
 requires 'HTML::Entities';
+requires 'List::Util';
 
 on test => sub {
     requires 'Test::More', '0.88';

@@ -7,21 +7,60 @@ our $VERSION = '0.1';
 use parent qw/Exporter/;
 use HTML::Parser;
 use HTML::Entities;
+use List::Util qw/reduce/;
+use Email::MIME::ContentType;
 
 our @EXPORT_OK = qw/_parse_for_text/;
+
+sub _ct {
+    my $data = parse_content_type($_[0]);
+
+    return "$data->{discrete}/$data->{composite}";
+}
+
+our %CT_WEIGHT = {
+    'text/html'                 => 10,
+    'multipart/related'         => 9,
+    'multipart/mixed'           => 9,
+    'multipart/alternative'     => 8,
+    'text/plain'                => 7,
+};
+
+sub _ct_pref {
+    my $header = shift;
+
+    return $CT_WEIGHT{_ct($header)} || 1;
+}
+
+sub _render_recur {
+    my $part = shift;
+    my $result;
+
+    given (_ct($part->content_type)) {
+        when ('multipart/alternative') {
+            my $best_part = reduce { _ct_pref($a) > _ct_pref($b) ? $a : $b } $part->subparts;
+            $result = _render_recur($best_part);
+        }
+        when ('text/html') {
+            $result = textify_html($part->body_str);
+        }
+        when (m{^text/}) {
+            $result = $part->body_str;
+        }
+    }
+
+    return $result;
+}
 
 sub _parse_for_text {
     my $email = shift;
 
-    my $body_str;
-    if ($email->content_type =~ m{text/html}) {
-        $body_str = textify_html($email->body_str);
-    }
-    else {
-        $body_str = $email->body_str;
-    }
+    my $body_str = _render_recur($email);
 
     $body_str =~ s/^\s+//s;
+
+    $body_str =~ s/\n--[ ]?\n.*\z//s;
+
     $body_str =~ s/\s+\z//s;
 
     return $body_str;
@@ -105,9 +144,6 @@ sub _textify_end_tag {
     }
 }
 
-#   _textify_decode()
-# Get: ($html_part)
-# Return: $text
 sub _textify_decode {
     my $t = unescapeHTMLFull($_[0]);
     $t =~ tr/\xA0/ /; # nbsp => space
