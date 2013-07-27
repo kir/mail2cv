@@ -7,11 +7,9 @@ Subject: gmail html
 Content-Type: multipart/alternative; boundary=047d7b6dd040f5526204e27c0988
 
 --047d7b6dd040f5526204e27c0988
-Content-Type: text/plain; charset=KOI8-R
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
 
-/NTPINDF0tfB0SDT1NLPy8EuDQr81M8g19TP0sHRLg0KDQr81M8g1NLF1NjRINDP08zFINDV09TP
-yi4NCg0KLS0gDQpBbGV4IEthcHJhbm9mZi4NCg==
+Something completely different.
 --047d7b6dd040f5526204e27c0988
 Content-Type: text/html; charset=KOI8-R
 Content-Transfer-Encoding: base64
