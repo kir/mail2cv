@@ -28,7 +28,7 @@ sub is_email_parsed_ok {
 
 is_email_parsed_ok('01-simple.eml', {
         text        => 'takoe',
-        login       => 'vasya@yandex.com',
+        login       => 'vasya@example.com',
         remotekey   => 'key1',
     });
 
