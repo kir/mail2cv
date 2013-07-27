@@ -37,6 +37,9 @@ sub _render_recur {
     my $result;
 
     given (_ct($part->content_type)) {
+        when ('multipart/related') {
+            $result = _render_recur(($part->subparts)[0]);
+        }
         when ('multipart/alternative') {
             my $best_part = reduce { _ct_pref($a) > _ct_pref($b) ? $a : $b } $part->subparts;
             $result = _render_recur($best_part);

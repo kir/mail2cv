@@ -43,3 +43,7 @@ is_email_parsed_ok('02-single-html.eml', {
 is_email_parsed_ok('03-mpalt.eml', {
         note        => "Это первая строка.\nЭто вторая.\n\nЭто третья после пустой.",
     });
+
+is_email_parsed_ok('04-mprel.eml', {
+        note        => "Картинка:\n\n После картинки.",
+    });
