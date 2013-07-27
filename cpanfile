@@ -9,6 +9,8 @@ requires 'Email::Address';
 requires 'parent';
 requires 'List::Util';
 requires 'Config::Tiny';
+requires 'HTML::Parser';
+requires 'HTML::Entities';
 
 on test => sub {
     requires 'Test::More', '0.88';

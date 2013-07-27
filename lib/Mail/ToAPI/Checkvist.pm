@@ -10,6 +10,8 @@ use Email::Address;
 use List::Util qw/first/;
 use URI;
 
+use Mail::ToAPI::Text qw/_parse_for_text/;
+
 our $API_Endpoint = 'http://checkvist.com';
 our $Chv;
 our $Last_Error;
@@ -63,17 +65,6 @@ sub _parse_to {
     }
 
     return ($login, $remotekey, $list_id, $list_tag);
-}
-
-sub _parse_for_text {
-    my $email = shift;
-
-    my $body_str = $email->body_str;
-
-    $body_str =~ s/^\s+//s;
-    $body_str =~ s/\s+\z//s;
-
-    return $body_str;
 }
 
 sub parse_email {

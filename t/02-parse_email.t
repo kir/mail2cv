@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+use uni::perl;
+
 use Test::More qw/no_plan/;
 use Test::Deep;
 use Test::NoWarnings;
@@ -32,4 +34,8 @@ is_email_parsed_ok('01-simple.eml', {
 
 is_email_parsed_ok('01-simple.eml', {
         note        => 'note1',
+    });
+
+is_email_parsed_ok('02-single-html.eml', {
+        note        => "note2 in html\nw some Unicode: 🂄 and ♣\nline1\nline2",
     });
