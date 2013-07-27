@@ -27,7 +27,7 @@ my $add_task_job = {
 };
 
 sub ok_task_from_eml {
-    my $eml = shift;
+    my ($eml, $task_text, $task_note) = @_;
 
     my $uuid = create_UUID_as_string();
 
@@ -45,10 +45,18 @@ sub ok_task_from_eml {
     my $full_task = (grep { $_->{content} =~ /from email $uuid/ } @$tasks)[0];
 
     ok($full_task, "task $uuid added");
-    is($full_task->{notes}->[0]->{note}->{comment}, 'body', "note from email was added");
+
+    if ($task_text) {
+        like($full_task->{content}, qr/^$task_text/, 'task text');
+    }
+    if ($task_note) {
+        my $note = $full_task->{notes}->[0]->{note}->{comment};
+        $note =~ s/\r//g;
+        is($note, $task_note, 'note from email');
+    }
 }
 
-ok_task_from_eml(<<"EOM");
+ok_task_from_eml(<<"EOM", $test_task, 'body');
 From: "Mail2CV Tester" <$test_login>
 To: <$test_key+$test_list_id\@mail2cv.com>
 Subject: $test_task from eml via script
@@ -63,6 +71,31 @@ To: <$esc_test_login+$test_key+$test_list_id\@mail2cv.com>
 Subject: $test_task
 
 body
+EOM
+
+ok_task_from_eml(<<"EOM", "$test_task 1", "note!\ntakoe");
+MIME-Version: 1.0
+From: "Random Email" <random\@email.com>
+To: <$esc_test_login+$test_key+$test_list_id\@mail2cv.com>
+Subject: $test_task 1
+Content-Type: multipart/alternative; boundary=047d7b6dc1a862a67a04e280aa1d
+
+--047d7b6dc1a862a67a04e280aa1d
+Content-Type: text/plain; charset=ISO-8859-1
+
+note!
+takoe
+
+-- 
+Alex Kapranoff.
+
+--047d7b6dc1a862a67a04e280aa1d
+Content-Type: text/html; charset=ISO-8859-1
+
+note!<br>takoe<br><br clear="all"><div>-- <br>Alex Kapranoff.</div>
+
+--047d7b6dc1a862a67a04e280aa1d--
+
 EOM
 
 done_testing;
