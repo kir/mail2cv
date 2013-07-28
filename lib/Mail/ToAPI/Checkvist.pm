@@ -3,7 +3,7 @@ package Mail::ToAPI::Checkvist;
 use strict;
 use warnings;
 use 5.010;
-our $VERSION = '0.1';
+our $VERSION = '0.4';
 
 use WebService::Simple;
 use Email::MIME;

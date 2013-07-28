@@ -39,8 +39,12 @@
       },
       "runtime" : {
          "requires" : {
+            "Config::Tiny" : "0",
             "Email::Address" : "0",
             "Email::MIME" : "0",
+            "HTML::Entities" : "0",
+            "HTML::Parser" : "0",
+            "List::Util" : "0",
             "WebService::Simple" : "0",
             "parent" : "0",
             "perl" : "5.008005",
@@ -66,7 +70,7 @@
          "web" : "https://github.com/kappa/mail2cv"
       }
    },
-   "version" : "0.1",
+   "version" : "0.4",
    "x_contributors" : [
       "Alex Kapranoff <kappa@kibris.kapranoff.ru>"
    ]

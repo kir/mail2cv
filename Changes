@@ -1,4 +1,5 @@
 Revision history for Mail-ToAPI-Checkvist
 
 {{$NEXT}}
-        - Initial release
+        - Refactoring, notes, files, tests.
+        The result of collaboration with the Checkvist.com team.
