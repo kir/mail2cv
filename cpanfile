@@ -16,6 +16,7 @@ requires 'List::Util';
 on test => sub {
     requires 'Test::More', '0.88';
     requires 'Test::Deep';
+    requires 'Test::NoWarnings';
 };
 
 on develop => sub {

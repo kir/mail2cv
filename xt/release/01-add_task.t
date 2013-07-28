@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::NoWarnings;
 
 use Mail::ToAPI::Checkvist;
 
