@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+use uni::perl;
+
 use Test::More tests => 13 + 1; # ugh, for Test::NoWarning
 use Test::NoWarnings;
 

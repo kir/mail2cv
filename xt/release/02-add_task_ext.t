@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+use uni::perl;
+
 use Test::More;
 
 use Test::Script::Run;

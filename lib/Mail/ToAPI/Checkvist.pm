@@ -10,6 +10,7 @@ use Email::MIME;
 use Email::Address;
 use List::Util qw/first/;
 use URI;
+use Encode;
 
 use Mail::ToAPI::Text qw/_parse_for_content/;
 
@@ -139,14 +140,14 @@ sub _add_task {
 
     my %post_params = (
         Content => [
-            import_content  => $job->{text},
+            import_content  => encode_utf8($job->{text}),
             parse_tasks     => 1,
         ],
     );
 
     if ($job->{note}) {
         push @{$post_params{Content}},
-            import_content_note => $job->{note};
+            import_content_note => encode_utf8($job->{note});
     }
 
     # in: [ [$filename, $content_type, $data] ... ]
@@ -157,12 +158,13 @@ sub _add_task {
 
         my $num = 1;
         for my $file (@{$job->{files}}) {
+            my $ct = Mail::ToAPI::Text::_parse_header_fields("ct=$file->[1]");
             push @{$post_params{Content}},
                 "add_files[$num]"   => [
                     undef,
-                    $file->[0],
+                    encode_utf8($file->[0]),    # XXX
                     Content_Type    => $file->[1],
-                    Content         => $file->[2],
+                    Content         => ($ct->{charset} ? encode($ct->{charset}, $file->[2]) : $file->[2]),
                 ];
             ++$num;
         }
