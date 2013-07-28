@@ -1,6 +1,7 @@
 package Mail::ToAPI::Checkvist;
 
 use strict;
+use warnings;
 use 5.010;
 our $VERSION = '0.1';
 
@@ -140,26 +141,67 @@ sub _add_task {
         }
     }
 
-    my $rv =
-        $chv->post("checklists/$job->{list_id}/import.json", {
+    my %post_params = (
+        Content => [
             import_content  => $job->{text},
             parse_tasks     => 1,
-            ($job->{note}
-                ? (import_content_note => $job->{note})
-                : ()),
-        });
+        ],
+    );
 
-    return $rv && $rv->parse_response->[0];
+    if ($job->{note}) {
+        push @{$post_params{Content}},
+            import_content_note => $job->{note};
+    }
+
+    # in: [ [$filename, $content_type, $data] ... ]
+    # out: [ undef, $filename,
+    #   Content_Type => $content_type, Content => $data ]
+    if ($job->{files}) {
+        $post_params{Content_Type} = 'form-data';
+
+        my $num = 1;
+        for my $file (@{$job->{files}}) {
+            push @{$post_params{Content}},
+                "add_files[$num]"   => [
+                    undef,
+                    $file->[0],
+                    Content_Type    => $file->[1],
+                    Content         => $file->[2],
+                ];
+            ++$num;
+        }
+    }
+
+    $Last_Error = '';
+    my $rv = $chv->post(
+        "checklists/$job->{list_id}/import.json",
+        %post_params
+    );
+
+    if ($rv->is_success) {
+        return $rv->parse_response->[0];
+    }
+    else {
+        $Last_Error = $rv->status_line;
+        return;
+    }
 }
 
 sub fetch_tasks {
     my ($login, $remotekey, $list_id) = @_;
     my $chv = _init_api($login, $remotekey);
 
+    $Last_Error = '';
     my $rv = $chv->get("checklists/$list_id/tasks.json",
         { with_notes    => 1 });
 
-    return $rv && $rv->parse_response;
+    if ($rv->is_success) {
+        return $rv->parse_response;
+    }
+    else {
+        $Last_Error = $rv->status_line;
+        return;
+    }
 }
 
 sub last_error {
