@@ -69,4 +69,12 @@ is_email_parsed_ok('08-two-files-rusnames.eml', {
         ],
     });
 
+is_email_parsed_ok('09-rel-files-thund.eml', {
+        text        => 'из thunderbird',
+        note        => "текст\n\n ещё текст\n\n ещё текст 2",
+        files       => [
+            [ 'очень-длинное-имя-файла-на-русском-йййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййй.bin', 'application/octet-stream', "1\n" ],
+        ],
+    });
+
 done_testing;

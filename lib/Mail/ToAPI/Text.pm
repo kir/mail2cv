@@ -7,13 +7,39 @@ our $VERSION = '0.1';
 use parent qw/Exporter/;
 use HTML::Parser;
 use HTML::Entities;
-use List::Util qw/reduce/;
+use List::Util qw/reduce first/;
 use HTTP::Headers::Util;
+use Encode;
 
 our @EXPORT_OK = qw/_parse_for_content/;
 
 sub _parse_header_fields {
-    return { @{(HTTP::Headers::Util::split_header_words($_[0]))[0]} }
+    my $fields = { @{(HTTP::Headers::Util::split_header_words($_[0]))[0]} };
+
+    # this is a parser for a subset of RFC2231
+    # which is a big brother for RFC2047 MIME words
+    # Mozilla Thunderbird uses RFC2231
+    if (my $start = first { /\*0\*$/ } keys %$fields) {
+        my $value = '';
+        $start =~ /^([^*]+)\*0\*$/;
+        my $field_name = $1;
+
+        my $counter = 0;
+        while (my $next_chunk = delete $fields->{"$field_name*$counter*"}) {
+            $value .= $next_chunk;
+            ++$counter;
+        }
+        $value =~ s/^([^']*)'([^']*)'//;
+        my ($charset, $lang) = ($1, $2);
+
+        $value =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+
+        $fields->{$field_name} = $charset
+            ? decode($charset, $value)
+            : $value;
+    }
+
+    return $fields;
 }
 
 sub _ct {
