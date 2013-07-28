@@ -67,7 +67,7 @@ sub _parse_for_text {
 
     $body_str =~ s/^\s+//s;
 
-    $body_str =~ s/(?:\n|^)--[ ]?\n.*\z//s;
+    $body_str =~ s/(?:\r?\n|^)--[ ]?\r?\n.*\z//s;
 
     $body_str =~ s/\s+\z//s;
 
