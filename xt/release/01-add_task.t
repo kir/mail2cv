@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 13 + 1; # ugh, for Test::NoWarning
 use Test::NoWarnings;
 
 use Mail::ToAPI::Checkvist;
@@ -57,5 +57,3 @@ delete $add_task_job->{list_id};
 delete $add_task_job->{list_tag};
 ok($rv = Mail::ToAPI::Checkvist->execute($add_task_job), 'task added by default tag');
 is($rv->{checklist_id}, $test_list_inbox_id, 'found the correct list');
-
-done_testing;
