@@ -4,7 +4,7 @@ use warnings;
 
 use uni::perl;
 
-use Test::More qw/no_plan/;
+use Test::More;
 use Test::Deep;
 use Test::NoWarnings;
 
@@ -26,6 +26,7 @@ sub is_email_parsed_ok {
 
     cmp_deeply($job, superhashof({ %$data, type => 'add_task' }),
         "test in $base_eml");
+    ok(!$job->{files}, "no files in $base_eml");
 }
 
 is_email_parsed_ok('01-simple.eml', {
@@ -49,7 +50,7 @@ cmp_deeply(job_from_eml('021-single-html-only-sig.eml'), {
         list_id => ignore(),
         list_tag=> ignore(),
         remotekey=> ignore(),
-    });
+    }, '021-single-html-only-sig');
 
 is_email_parsed_ok('03-mpalt.eml', {
         note        => "Это первая строка.\nЭто вторая.\n\nЭто третья после пустой.",
@@ -63,9 +64,4 @@ is_email_parsed_ok('04-mprel.eml', {
         note        => "Картинка:\n\n После картинки.",
     });
 
-is_email_parsed_ok('05-mpmixed.eml', {
-        note        => "A small attachment follows.",
-    });
-is_email_parsed_ok('051-mpmixed-ex.eml', {
-        note        => "A small attachment follows.\n\nSecond text file.",
-    });
+done_testing;

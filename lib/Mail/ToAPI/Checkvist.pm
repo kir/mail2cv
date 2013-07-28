@@ -11,7 +11,7 @@ use Email::Address;
 use List::Util qw/first/;
 use URI;
 
-use Mail::ToAPI::Text qw/_parse_for_text/;
+use Mail::ToAPI::Text qw/_parse_for_content/;
 
 our $API_Endpoint = 'http://checkvist.com';
 our $Chv;
@@ -81,7 +81,7 @@ sub parse_email {
 
     my ($login, $remotekey, $list_id, $list_tag) = _parse_to($email->header_obj->header_raw('To'));
 
-    my $body_text = _parse_for_text($email);
+    my ($body_text, $files)   = _parse_for_content($email);
 
     $Last_Error = '';
     return {
@@ -95,7 +95,10 @@ sub parse_email {
         text        => $subject,
 
         ($body_text
-            ? (note        => $body_text)
+            ? (note         => $body_text)
+            : ()),
+        ($files && @$files
+            ? (files        => $files)
             : ()),
     };
 }

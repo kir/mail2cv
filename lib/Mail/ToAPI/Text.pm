@@ -8,62 +8,89 @@ use parent qw/Exporter/;
 use HTML::Parser;
 use HTML::Entities;
 use List::Util qw/reduce/;
-use Email::MIME::ContentType;
+use HTTP::Headers::Util;
 
-our @EXPORT_OK = qw/_parse_for_text/;
+our @EXPORT_OK = qw/_parse_for_content/;
+
+sub _parse_header_fields {
+    return { @{(HTTP::Headers::Util::split_header_words($_[0]))[0]} }
+}
 
 sub _ct {
-    my $data = parse_content_type($_[0]);
+    my $data = _parse_header_fields("ct=$_[0]");
 
-    return "$data->{discrete}/$data->{composite}";
+    return $data->{ct};
 }
 
 sub _may_contain_text {
     my $part = shift;
 
-    my $ct = parse_content_type($part->content_type);
+    my $ct = _parse_header_fields("ct=" . $part->content_type);
 
-    return  $ct->{discrete} eq 'multipart'
-        || ($ct->{discrete} eq 'text'
-            && ($ct->{composite} eq 'plain' || $ct->{composite} eq 'html')
-            && ($part->header('Content-Disposition') || '') !~ /^attachment\b/)
+    return  $ct->{ct} =~ m{^multipart/}i
+        || ($ct->{ct} =~ m{^text/(?:plain|html)$}i
+            && ($part->header('Content-Disposition') || '') !~ /^attachment\b/i);
 }
 
 sub _render_recur {
     my $part = shift;
-    my $result;
+    my ($result_str, $files) = ('', undef);
 
-    given (_ct($part->content_type)) {
-        when ('multipart/related') {
-            $result = _render_recur(($part->subparts)[0]);
-        }
-        when ('multipart/alternative') {
-            # choose the last of all supported, may also be
-            # implemented as (grep)[-1]
-            # if there's 1 subpart, always return it
-            my $best_part = reduce { _may_contain_text($b) ? $b : $a } $part->subparts;
-            $result = _render_recur($best_part);
-        }
-        when (m{^multipart/}) { # 'mixed' and all others
-            $result = join "\n",
-                map { _render_recur($_) }
-                grep { _may_contain_text($_) } $part->subparts;
-        }
-        when ('text/html') {
-            $result = textify_html($part->body_str);
-        }
-        when (m{^text/}) {
-            $result = $part->body_str;
+    my $content_type = _ct($part->content_type) || 'text/plain';
+
+    my $disp;
+    if (my $cd = $part->header('Content-Disposition')) {
+        $disp = _parse_header_fields("d=$cd");
+    }
+
+    if ($disp->{d} && $disp->{d} eq 'attachment') {
+        push @$files, [$disp->{filename}, $content_type,
+            $content_type =~ /^text\// ? $part->body_str : $part->body];
+    }
+    else {
+        given ($content_type) {
+            when ('multipart/related') {
+                ($result_str, $files) = _render_recur(($part->subparts)[0]);
+            }
+            when ('multipart/alternative') {
+                # choose the last of all supported, may also be
+                # implemented as (grep)[-1]
+                # if there's 1 subpart, always return it
+                my $best_part = reduce { _may_contain_text($b) ? $b : $a } $part->subparts;
+                ($result_str, $files) = _render_recur($best_part);
+            }
+            when (m{^multipart/}) { # 'mixed' and all others
+                for my $subpart ($part->subparts) {
+                    my ($part_str, $part_files) = _render_recur($subpart);
+                    if (_may_contain_text($subpart)) {
+                        $result_str .= $part_str . "\n";
+                    }
+                    push @$files, @$part_files if $part_files;
+                }
+                $result_str =~ s/\n\z//; # emulate join
+            }
+            when ('text/html') {
+                $result_str = textify_html($part->body_str);
+            }
+            when (m{^text/}) {
+                $result_str = $part->body_str;
+            }
+            default {
+                # cannot render this part inline, so emulate attachment
+                # should not happen very often
+                push @$files, [$disp->{filename}, $content_type,
+                    $content_type =~ /^text\// ? $part->body_str : $part->body];
+            }
         }
     }
 
-    return $result;
+    return ($result_str, $files);
 }
 
-sub _parse_for_text {
+sub _parse_for_content {
     my $email = shift;
 
-    my $body_str = _render_recur($email);
+    my ($body_str, $files) = _render_recur($email);
 
     $body_str =~ s/^\s+//s;
 
@@ -71,7 +98,7 @@ sub _parse_for_text {
 
     $body_str =~ s/\s+\z//s;
 
-    return $body_str;
+    return ($body_str, $files);
 }
 
 *unescapeHTMLFull = \&HTML::Entities::decode_entities;

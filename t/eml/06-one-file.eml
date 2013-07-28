@@ -1,0 +1,20 @@
+MIME-Version: 1.0
+From: Alex Kapranoff <kapranoff@example.com>
+Date: Sun, 28 Jul 2013 22:30:42 +0400
+Subject: simple attach
+To: Alex Kapranoff <kappa@example.com>
+Content-Type: multipart/mixed; boundary=047d7b6d8c388f332d04e2969411
+
+--047d7b6d8c388f332d04e2969411
+Content-Type: text/plain; charset=KOI8-R
+Content-Transfer-Encoding: base64
+
+8NLJ18XUISD3z9QgxsHKzC4NCg0KLS0NCkFsZXggS2FwcmFub2ZmLg0K
+--047d7b6d8c388f332d04e2969411
+Content-Type: text/plain; charset=US-ASCII; name="example.txt"
+Content-Disposition: attachment; filename="example.txt"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_hjol25zu0
+
+MQo=
+--047d7b6d8c388f332d04e2969411--
