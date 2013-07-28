@@ -27,7 +27,7 @@ sub _init_api {
             response_parser => 'JSON',
         );
 
-        $Chv->credentials($uri->host_port, 'Application', $login, $remotekey);
+        $Chv->default_headers->authorization_basic($login, $remotekey);
     }
 
     return $Chv;
