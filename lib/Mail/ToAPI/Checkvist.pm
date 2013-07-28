@@ -131,14 +131,7 @@ sub _add_task {
 
     unless ($job->{list_id}) {
         my $list_tag = $job->{list_tag} // 'inbox';   # default
-        my $lists = $chv->get("checklists.json")->parse_response;
-
-        if (my $list = first { $_->{tags}->{$list_tag} eq 'false' } @$lists) {
-            $job->{list_id} = $list->{id};
-        }
-        else {
-            die "list tag not found\n";
-        }
+        $job->{list_id} = "tag:$list_tag"; # supported by API
     }
 
     my %post_params = (

@@ -7,6 +7,9 @@ use Test::NoWarnings;
 
 use Mail::ToAPI::Checkvist;
 
+# import.json by list tag is only deployed on beta
+$Mail::ToAPI::Checkvist::API_Endpoint = 'https://beta.checkvist.com';
+
 my ($test_login, $test_key, $test_list_id) = ('mail2cv@yandex.ru', 'N7DfDkOm0kWf', 203740);
 my $test_task = 'test task';
 my $test_list_tag = 'inb';
@@ -48,7 +51,7 @@ is($rv->{checklist_id}, $test_list_id, 'found the correct list');
 delete $add_task_job->{list_id};
 $add_task_job->{list_tag} = $test_list_tag . 'xxx';
 ok(!Mail::ToAPI::Checkvist->execute($add_task_job), 'tag does not exist');
-like(Mail::ToAPI::Checkvist->last_error, qr/list tag not found/, 'correct last error');
+isnt(Mail::ToAPI::Checkvist->last_error, '', 'there was an error');
 
 delete $add_task_job->{list_id};
 delete $add_task_job->{list_tag};
