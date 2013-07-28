@@ -30,9 +30,15 @@ sub is_email_parsed_ok {
 
 is_email_parsed_ok('05-mpmixed.eml', {
         note        => "A small attachment follows.",
+        files       => [
+            ['1.txt', 'text/plain', "1\n"],
+        ],
     });
 is_email_parsed_ok('051-mpmixed-ex.eml', {
         note        => "A small attachment follows.\n\nSecond text file.",
+        files       => [
+            [undef, 'x-something/something', "Third text file.\n\n"],
+        ],
     });
 
 is_email_parsed_ok('06-one-file.eml', {
