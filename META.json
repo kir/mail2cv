@@ -54,7 +54,8 @@
       "test" : {
          "requires" : {
             "Test::Deep" : "0",
-            "Test::More" : "0.88"
+            "Test::More" : "0.88",
+            "Test::NoWarnings" : "0"
          }
       }
    },
