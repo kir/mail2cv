@@ -75,9 +75,6 @@ sub _render_recur {
     }
     else {
         given ($content_type) {
-            when ('multipart/related') {
-                ($result_str, $files) = _render_recur(($part->subparts)[0]);
-            }
             when ('multipart/alternative') {
                 # choose the last of all supported, may also be
                 # implemented as (grep)[-1]
@@ -85,7 +82,7 @@ sub _render_recur {
                 my $best_part = reduce { _may_contain_text($b) ? $b : $a } $part->subparts;
                 ($result_str, $files) = _render_recur($best_part);
             }
-            when (m{^multipart/}) { # 'mixed' and all others
+            when (m{^multipart/}) { # 'mixed', 'related' and all others
                 for my $subpart ($part->subparts) {
                     my ($part_str, $part_files) = _render_recur($subpart);
                     if (_may_contain_text($subpart)) {
