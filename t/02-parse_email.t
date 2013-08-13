@@ -20,13 +20,13 @@ sub job_from_eml {
 }
 
 sub is_email_parsed_ok {
-    my ($base_eml, $data) = @_;
+    my ($base_eml, $data, $files_present) = @_;
 
     my $job = job_from_eml($base_eml);
 
     cmp_deeply($job, superhashof({ %$data, type => 'add_task' }),
         "test in $base_eml");
-    ok(!$job->{files}, "no files in $base_eml");
+    $files_present or ok(!$job->{files}, "no files in $base_eml");
 }
 
 is_email_parsed_ok('01-simple.eml', {
@@ -62,6 +62,6 @@ is_email_parsed_ok('031-mpalt-ex.eml', {
 
 is_email_parsed_ok('04-mprel.eml', {
         note        => "Картинка:\n\n После картинки.",
-    });
+    }, 'увы');
 
 done_testing;
