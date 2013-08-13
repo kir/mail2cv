@@ -1,0 +1,35 @@
+MIME-Version: 1.0
+From: Alex Kapranoff <kapranoff@example.com>
+Date: Wed, 14 Aug 2013 01:48:08 +0400
+Message-ID: <CAHw_nxhJ29Dj0_oasFtQbhyevv38Z2mQturcPiEu4Poew@mail.example.com>
+Subject: task task task!
+To: Alex Kapranoff <kappa@example.com>
+Content-Type: multipart/related; boundary=bcaec5215da123797c04e3db3487
+
+--bcaec5215da123797c04e3db3487
+Content-Type: multipart/alternative; boundary=bcaec5215da123797904e3db3486
+
+--bcaec5215da123797904e3db3486
+Content-Type: text/plain; charset=KOI8-R
+
+111[image: Inline image 1]
+-- 
+Alex Kapranoff.
+
+--bcaec5215da123797904e3db3486
+Content-Type: text/html; charset=KOI8-R
+
+<div dir="ltr">111<img alt="Inline image 1" src="cid:ii_14079a5e82c8ed57"><br clear="all"><div>-- <br>Alex Kapranoff.</div>
+</div>
+
+--bcaec5215da123797904e3db3486--
+--bcaec5215da123797c04e3db3487
+Content-Type: image/jpeg; name="CAM00021.jpg"
+Content-Transfer-Encoding: base64
+Content-ID: <ii_14079a5e82c8ed57>
+X-Attachment-Id: ii_14079a5e82c8ed57
+
+/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAIBAQEBAQIBAQECAgICAgQDAgICAgUEBAMEBgUGBgYF
+ubj7Iy5+ZcPJ1Z//2Q==
+--bcaec5215da123797c04e3db3487--
+

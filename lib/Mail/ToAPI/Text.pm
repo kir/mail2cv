@@ -42,10 +42,23 @@ sub _parse_header_fields {
     return $fields;
 }
 
-sub _ct {
-    my $data = _parse_header_fields("ct=$_[0]");
+sub _parse_ct_and_disp {
+    my ($ct, $disp) = @_;
 
-    return $data->{ct};
+    my $ct_parsed = _parse_header_fields("ct=$ct");
+    my $ds_parsed = $disp ? _parse_header_fields("d=$disp") : undef;
+
+    return ($ct_parsed, $ds_parsed);
+}
+
+sub _conjure_filename {
+    my ($ct, $disp) = @_;
+
+    return $disp->{filename} // $ct->{name}
+        // do {
+            (my $content_type = $ct->{ct}) =~ s{/}{-};
+            "$content_type-file";
+        };
 }
 
 sub _may_contain_text {
@@ -62,14 +75,14 @@ sub _render_recur {
     my $part = shift;
     my ($result_str, $files) = ('', undef);
 
-    my $content_type = _ct($part->content_type) || 'text/plain';
+    my ($ct, $disp) = _parse_ct_and_disp($part->content_type,
+        $part->header('Content-Disposition'));
 
-    my $disp;
-    if (my $cd = $part->header('Content-Disposition')) {
-        $disp = _parse_header_fields("d=$cd");
-    }
+    my $content_type = $ct->{ct} || 'text/plain';
 
-    if ($disp->{d} && $disp->{d} eq 'attachment') {
+    my $filename = _conjure_filename($ct, $disp);
+
+    if ($disp && $disp->{d} && $disp->{d} eq 'attachment') {
         push @$files, [$disp->{filename}, $content_type,
             $content_type =~ /^text\// ? $part->body_str : $part->body];
     }
@@ -101,7 +114,7 @@ sub _render_recur {
             default {
                 # cannot render this part inline, so emulate attachment
                 # should not happen very often
-                push @$files, [$disp->{filename}, $content_type,
+                push @$files, [$filename, $content_type,
                     $content_type =~ /^text\// ? $part->body_str : $part->body];
             }
         }

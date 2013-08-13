@@ -37,7 +37,7 @@ is_email_parsed_ok('05-mpmixed.eml', {
 is_email_parsed_ok('051-mpmixed-ex.eml', {
         note        => "A small attachment follows.\n\nSecond text file.",
         files       => [
-            [undef, 'x-something/something', "Third text file.\n\n"],
+            ['x-something-something-file', 'x-something/something', "Third text file.\n\n"],
         ],
     });
 
@@ -75,6 +75,14 @@ is_email_parsed_ok('09-rel-files-thund.eml', {
         files       => [
             [ 'gfhgfagf.gif', 'image/gif', ignore() ],
             [ 'очень-длинное-имя-файла-на-русском-йййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййййй.bin', 'application/octet-stream', "1\n" ],
+        ],
+    });
+
+is_email_parsed_ok('10-rel-img-gmail.eml', {
+        text        => 'task task task!',
+        note        => '111',
+        files       => [
+            [ 'CAM00021.jpg', 'image/jpeg', ignore() ],
         ],
     });
 
