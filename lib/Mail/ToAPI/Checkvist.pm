@@ -147,8 +147,10 @@ sub _add_task {
     );
 
     if ($job->{note}) {
+	    my $patched4markdown = $job->{note};
+	    $patched4markdown =~ s/(\r?\n)/  $1/g;
         push @{$post_params{Content}},
-            import_content_note => encode_utf8($job->{note});
+            import_content_note => encode_utf8($patched4markdown);
     }
 
     # in: [ [$filename, $content_type, $data] ... ]
