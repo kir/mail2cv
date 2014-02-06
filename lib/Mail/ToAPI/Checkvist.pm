@@ -80,7 +80,8 @@ sub parse_email {
     $subject = $email->header('Subject');
     $from = (Email::Address->parse($email->header_obj->header_raw('From')))[0]->address;
 
-    my ($login, $remotekey, $list_id, $list_tag) = _parse_to($email->header_obj->header_raw('To'));
+    my $to_header = $email->header_obj->header_raw('Delivered-To') // $email->header_obj->header_raw('To');
+    my ($login, $remotekey, $list_id, $list_tag) = _parse_to($to_header);
 
     my ($body_text, $files)   = _parse_for_content($email);
 
