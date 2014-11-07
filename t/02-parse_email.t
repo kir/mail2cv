@@ -39,6 +39,15 @@ is_email_parsed_ok('01-simple.eml', {
         note        => 'note1',
     });
 
+is_email_parsed_ok('011-simple-no-subject.eml', {
+    	text        => 'note1',
+    });
+
+is_email_parsed_ok('012-simple-no-subject-multiline.eml', {
+    	text        => 'note1',
+        note        => "note1\nnote1",
+    });
+
 is_email_parsed_ok('02-single-html.eml', {
         note        => "note2 in html\nw some Unicode: 🂄 and ♣\nline1\nline2",
     });

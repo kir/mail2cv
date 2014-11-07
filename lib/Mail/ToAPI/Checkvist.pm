@@ -72,7 +72,7 @@ sub _parse_to {
 sub parse_email {
     my $fh = pop;
 
-    my ($from, $to, $subject);
+    my ($from, $to, $subject, $item_text);
 
     binmode $fh, ':bytes';
     my $email = Email::MIME->new(join "", <$fh>);
@@ -84,6 +84,14 @@ sub parse_email {
     my ($login, $remotekey, $list_id, $list_tag) = _parse_to($to_header);
 
     my ($body_text, $files)   = _parse_for_content($email);
+    
+    $item_text = $subject // (split /\n/, $body_text // 'Created from E-Mail' )[0];
+    $item_text =~ s/\s+$//;
+    $body_text =~ s/\s+$//;
+    if ($item_text eq $body_text) {
+	    # Remove note if its text is the same as item text
+	    undef $body_text;
+	}
 
     $Last_Error = '';
     return {
@@ -94,7 +102,7 @@ sub parse_email {
 
         list_id     => $list_id,
         list_tag    => $list_tag,
-        text        => $subject,
+        text        => $item_text,
 
         ($body_text
             ? (note         => $body_text)
