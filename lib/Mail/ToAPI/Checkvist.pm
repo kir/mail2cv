@@ -72,12 +72,11 @@ sub _parse_to {
 sub parse_email {
     my $fh = pop;
 
-    my ($from, $to, $subject, $item_text);
+    my ($from, $to, $item_text);
 
     binmode $fh, ':bytes';
     my $email = Email::MIME->new(join "", <$fh>);
 
-    $subject = $email->header('Subject');
     $from = (Email::Address->parse($email->header_obj->header_raw('From')))[0]->address;
 
     my $to_header = $email->header_obj->header_raw('Delivered-To') // $email->header_obj->header_raw('To');
@@ -85,7 +84,7 @@ sub parse_email {
 
     my ($body_text, $files)   = _parse_for_content($email);
     
-    $item_text = $subject // (split /\n/, $body_text // 'Created from E-Mail')[0];
+    $item_text = $email->header('Subject') // (split /\n/, $body_text // 'Created from E-Mail')[0];
     $item_text =~ s/\s+$//;
     if ($body_text) {
 	    $body_text =~ s/\s+$//;
