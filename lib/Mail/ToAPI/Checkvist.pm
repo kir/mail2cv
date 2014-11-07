@@ -85,9 +85,11 @@ sub parse_email {
 
     my ($body_text, $files)   = _parse_for_content($email);
     
-    $item_text = $subject // (split /\n/, $body_text // 'Created from E-Mail' )[0];
+    $item_text = $subject // (split /\n/, $body_text // 'Created from E-Mail')[0];
     $item_text =~ s/\s+$//;
-    $body_text =~ s/\s+$//;
+    if ($body_text) {
+	    $body_text =~ s/\s+$//;
+    }
     if ($item_text eq $body_text) {
 	    # Remove note if its text is the same as item text
 	    undef $body_text;
