@@ -3,7 +3,7 @@ package Mail::ToAPI::Text;
 use strict;
 use 5.010;
 our $VERSION = '0.1';
-no warnings 'experimental::smartmatch';
+#no warnings 'experimental::smartmatch';
 
 use parent qw/Exporter/;
 use HTML::Parser;

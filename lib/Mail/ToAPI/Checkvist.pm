@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 our $VERSION = '0.4';
-no warnings 'experimental::smartmatch';
+#no warnings 'experimental::smartmatch';
 
 use WebService::Simple;
 use Email::MIME;
