@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 our $VERSION = '0.4';
+no warnings 'experimental::smartmatch';
 
 use WebService::Simple;
 use Email::MIME;
@@ -171,14 +172,16 @@ sub _add_task {
         my $num = 1;
         for my $file (@{$job->{files}}) {
             my $ct = Mail::ToAPI::Text::_parse_header_fields("ct=$file->[1]");
-            push @{$post_params{Content}},
-                "add_files[$num]"   => [
-                    undef,
-                    encode_utf8($file->[0]),    # XXX
-                    Content_Type    => $file->[1],
-                    Content         => ($ct->{charset} ? encode($ct->{charset}, $file->[2]) : $file->[2]),
-                ];
-            ++$num;
+            if ($file->[0]) {
+	            push @{$post_params{Content}},
+	                "add_files[$num]"   => [
+	                    undef,
+	                    encode_utf8($file->[0]),    # XXX
+	                    Content_Type    => $file->[1],
+	                    Content         => ($ct->{charset} ? encode($ct->{charset}, $file->[2]) : $file->[2]),
+	                ];
+	            ++$num;
+			}
         }
     }
 
