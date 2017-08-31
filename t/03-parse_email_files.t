@@ -43,7 +43,14 @@ is_email_parsed_ok('051-mpmixed-ex.eml', {
 is_email_parsed_ok('052-mpmixed-noname.eml', {
         note        => "A small attachment follows.",
         files       => [ 
-			[ undef, 'text/plain', "1\n"]
+			[ 'text-plain-file', 'text/plain', "1\n"]
+        ],
+    });
+
+is_email_parsed_ok('053-noname-rfc822-message.eml', {
+        note        => "A small attachment follows.",
+        files       => [ 
+			[ 'message-rfc822-file.eml', 'message/rfc822', "1\n"]
         ],
     });
 

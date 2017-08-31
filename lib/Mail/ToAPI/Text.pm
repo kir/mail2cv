@@ -55,11 +55,15 @@ sub _parse_ct_and_disp {
 sub _conjure_filename {
     my ($ct, $disp) = @_;
 
-    return $disp->{filename} // $ct->{name}
+    my $res = $disp->{filename} // $ct->{name}
         // do {
             (my $content_type = $ct->{ct}) =~ s{/}{-};
             "$content_type-file";
         };
+    if ($res =~ /rfc822-file$/) {
+        $res .= ".eml";
+    }
+    return $res;
 }
 
 sub _may_contain_text {
@@ -132,8 +136,10 @@ sub _parse_for_content {
     $body_str =~ s/^\s+//s;
 
     $body_str =~ s/(?:\r?\n|^)--[ ]?\r?\n.*\z//s;
+    
+    $body_str =~ s/ *=\r?\n?\z//s;
 
-    $body_str =~ s/\s+\z//s;
+    $body_str =~ s/[\r?\n\s]+\z//s;
 
     return ($body_str, $files);
 }
