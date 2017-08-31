@@ -84,7 +84,7 @@ sub _render_recur {
     my $filename = _conjure_filename($ct, $disp);
 
     if ($disp && $disp->{d} && $disp->{d} eq 'attachment') {
-        push @$files, [$disp->{filename}, $content_type,
+        push @$files, [$filename, $content_type,
             $content_type =~ /^text\// ? $part->body_str : $part->body];
     }
     else {
