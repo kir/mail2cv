@@ -152,6 +152,7 @@ sub _add_task {
         Content => [
             import_content  => encode_utf8($job->{text}),
             parse_tasks     => 1,
+            from_email      => 1,
             remote_key      => $job->{remotekey},
         ],
     );
