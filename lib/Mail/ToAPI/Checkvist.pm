@@ -48,15 +48,20 @@ sub _parse_to {
         # we do not allow "." in remotekey to distinguish between
         # user$domain.com+remotekey@ and
         # remotekey+list_tag
+        # say STDERR "Item text: $_";
+
         # fortunately, Checkvist remotekeys do not contain "."
-        when (/^ ([^+.]+) \+ (\d+) $/xms) {
+        if (/^ ([^+.]+) \+ (\d+) $/xms) {
             ($remotekey, $list_id) = ($1, $2);
+            next
         }
-        when (/^ ([^+.]+) \+ ([^+]+) $/xms) {
+        elsif (/^ ([^+.]+) \+ ([^+]+) $/xms) {
             ($remotekey, $list_tag) = ($1, $2);
+            next
         }
-        when (/^ ([^+.]+) $/xms) {
+        elsif (/^ ([^+.]+) $/xms) {
             $remotekey = $1;
+            next
         }
 
         if (s/^ ([^+]+) \+ //xms) {
@@ -120,10 +125,8 @@ sub execute {
     my $rv;
 
     eval {
-        given ($job->{type}) {
-            when ('add_task') {
+        if ($job->{type} eq 'add_task') {
                 $rv = _add_task($job);
-            }
         }
     };
 

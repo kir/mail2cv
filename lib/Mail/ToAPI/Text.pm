@@ -92,15 +92,14 @@ sub _render_recur {
             $content_type =~ /^text\// ? $part->body_str : $part->body];
     }
     else {
-        given ($content_type) {
-            when ('multipart/alternative') {
+            if ($content_type eq 'multipart/alternative') {
                 # choose the last of all supported, may also be
                 # implemented as (grep)[-1]
                 # if there's 1 subpart, always return it
                 my $best_part = reduce { _may_contain_text($b) ? $b : $a } $part->subparts;
                 ($result_str, $files) = _render_recur($best_part);
             }
-            when (m{^multipart/}) { # 'mixed', 'related' and all others
+            elsif ($content_type =~ m{^multipart/}) { # 'mixed', 'related' and all others
                 for my $subpart ($part->subparts) {
                     my ($part_str, $part_files) = _render_recur($subpart);
                     if (_may_contain_text($subpart)) {
@@ -110,19 +109,18 @@ sub _render_recur {
                 }
                 $result_str =~ s/\n\z//; # emulate join
             }
-            when ('text/html') {
+            elsif ($content_type eq 'text/html') {
                 $result_str = textify_html($part->body_str);
             }
-            when (m{^text/}) {
+            elsif ($content_type =~ m{^text/}) {
                 $result_str = $part->body_str;
             }
-            default {
+            else {
                 # cannot render this part inline, so emulate attachment
                 # should not happen very often
                 push @$files, [$filename, $content_type,
                     $content_type =~ /^text\// ? $part->body_str : $part->body];
             }
-        }
     }
 
     return ($result_str, $files);
